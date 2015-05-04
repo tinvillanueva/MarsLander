@@ -2,9 +2,16 @@ package com.tinvillanueva.marslander;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
+import android.graphics.Path;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Region;
+import android.graphics.Shader;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
 
 public class Game extends SurfaceView implements Runnable, SurfaceHolder.Callback{
 
@@ -15,10 +22,28 @@ public class Game extends SurfaceView implements Runnable, SurfaceHolder.Callbac
     private float y;
     private int screenWidth;
     private int screenHeight;
-    private int maxTerrainHeight;
     private boolean running;
     private Canvas canvas;
     private Bitmap bitmap;
+    private Bitmap rocket;
+    private Paint paint;
+
+    //terrain
+    private int maxTerrainHeight;
+    private final int TERRAIN_POINTS = 5;
+
+    private Paint terrainPaint;
+    private Path terrainPath;
+    private Region terrainRegion;
+    private Bitmap terrainTexture;
+    private BitmapShader terrainShade;
+
+    private Path platformPath;
+    private Region platformRegion;
+    private int platformWidth;
+    private int platformX;
+    private int platformY;
+
 
     //default constructor
     public Game(Context context) {
@@ -65,12 +90,26 @@ public class Game extends SurfaceView implements Runnable, SurfaceHolder.Callbac
 
     //setup game
     private void setupGame(){
+        running = false;
         holder = getHolder();
         holder.addCallback(this);
-        running = false;
         screenHeight = getHeight();
         screenWidth = getWidth();
-        maxTerrainHeight = screenHeight/2;
+        maxTerrainHeight = screenHeight/3;
+        
+        marsTerrain();
+    }
+
+    private void marsTerrain() {
+        //defining terrain texture
+        terrainTexture = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.mars);
+        terrainShade = new BitmapShader(terrainTexture, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+        terrainPaint = new Paint();
+        terrainPaint.setColor(0xFFFFFFFF);
+        terrainPaint.setStyle(Paint.Style.FILL);
+        terrainPaint.setShader(terrainShade);
+           //todo good night!
+
     }
 
     //start game thread
