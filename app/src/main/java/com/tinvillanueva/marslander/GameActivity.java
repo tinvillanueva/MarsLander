@@ -3,11 +3,14 @@ package com.tinvillanueva.marslander;
 import android.app.DownloadManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.Window;
 
 
 public class GameActivity extends ActionBarActivity implements OnTouchListener{
@@ -15,6 +18,12 @@ public class GameActivity extends ActionBarActivity implements OnTouchListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);  //removes title bar
+
+        Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
+
         setContentView(R.layout.game_activity);
     }
 
