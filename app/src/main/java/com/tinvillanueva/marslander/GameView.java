@@ -29,7 +29,6 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     private boolean running;
     private Canvas canvas;
     private Bitmap bitmap;
-    private Bitmap rocket;
     private Paint paint;
 
     //terrain
@@ -41,7 +40,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     private Region terrainRegion;
     private Bitmap terrainTexture;
     private BitmapShader terrainShade;
-//    private Random randomTerrain;
+    private Random randomTerrain;
 
     private Path landingPadPath;
     private Region landingPadRegion;
@@ -50,9 +49,18 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     private int landingPadX;
     private int landingPadY;
 
+    //flying object variables
+    private Bitmap rocket;
+    private Bitmap mainFlame;
+    private Bitmap leftFlame;
+    private Bitmap rightFlame;
+    private float rocketX;
+    private float rocketY;
+    private Path rocketPath;
+
+
+
     //default constructor
-
-
     public GameView(Context context) {
         super(context);
         setupGame();
@@ -107,16 +115,22 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     }
 
     private void doDraw(Canvas canvas) {
-        canvas.drawColor(Color.BLACK);
-
-        paint.setColor(Color.GREEN);
+        canvas.drawColor(Color.BLACK);  //background color
+        //terrain
+        canvas.drawRect(0, 0, screenWidth, screenHeight, paint);
+        canvas.drawPath(terrainPath,terrainPaint);
+        paint.setColor(Color.DKGRAY);
         canvas.drawPath(terrainPath, paint);
-        paint.setColor(Color.RED);
+
+//        paint.setColor(Color.GREEN);
+//        canvas.drawPath(terrainPath, paint);
+        //landing pad
+        paint.setColor(Color.BLUE);
         paint.setStyle(Paint.Style.STROKE);
         canvas.drawPath( landingPadPath, paint);
 
-        paint.setColor(Color.YELLOW);
-        canvas.drawPath(terrainPath, paint);
+        //rocket
+        canvas.drawBitmap(rocket, rocketX, rocketY, null);
     }
 
     //setup game
@@ -137,10 +151,11 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         paint.setStrokeWidth(5);
 
 
-        marsTerrain();
+        createMarsTerrain();
+        createRocketShip();
     }
 
-    private void marsTerrain() {
+    private void createMarsTerrain() {
         //terrain texture
         terrainTexture = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.mars);
         terrainShade = new BitmapShader(terrainTexture, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
@@ -153,7 +168,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         terrainPath.setFillType(Path.FillType.WINDING);
         terrainPath.setLastPoint(0, screenHeight);
         //random terrain path
-        Random randomTerrain = new Random();
+        randomTerrain = new Random();
 
         int lastX = 0;
         int lastY = screenHeight - randomTerrain.nextInt(screenHeight/2);
@@ -198,6 +213,12 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         }
     }
 
+    //support method for mars terrain
+    private int interpolateLinear(int start, int end, float part){
+        return (int) (start*(1-part) + end*part);
+    }
+
+    //landing pad where the rocket lands safely
     private void createLandingPad() {
         landingPadPath = new Path();
         landingPadPath.moveTo(landingPadX, landingPadY);
@@ -210,9 +231,19 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         landingPadRegion.setPath(landingPadPath, clip);
     }
 
-    private int interpolateLinear(int start, int end, float part){
-        return (int) (start*(1-part) + end*part);
+    //create rocketShip
+    private void createRocketShip() {
+        rocket = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.rocket);
+        rocketX = (screenWidth/8);
+        rocketY = (screenHeight/4) - (rocket.getHeight()/2);
+        mainFlame = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.main_flame);
+        leftFlame = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.left_flame);
+        rightFlame = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.right_flame);
+        rocketPath = new Path();
     }
+
+
+
 
     //start game thread
     public void startGame(){
