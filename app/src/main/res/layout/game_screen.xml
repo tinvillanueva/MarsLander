@@ -1,20 +1,24 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".GameActivity">
 
+    <com.tinvillanueva.marslander.GameView
+        android:id="@+id/gameView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btnLeftThruster"
-        android:layout_centerVertical="true"
-        android:layout_alignParentStart="true"
-        android:src="@drawable/rightthruster"/>
+        android:src="@drawable/leftthruster"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -26,14 +30,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btnMainThruster"
-        android:src="@drawable/rightthruster"
+        android:src="@drawable/mainthruster"
         android:layout_alignTop="@+id/btnPause"
         android:layout_alignParentEnd="true" />
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btnPause"
-        android:src="@drawable/rightthruster"
+        android:src="@drawable/pause"
         android:layout_alignTop="@+id/btnRightThruster"
         android:layout_toStartOf="@+id/btnMainThruster" />
 
@@ -45,6 +49,8 @@
         android:progress="200"
         android:progressDrawable="@drawable/fuelgauge"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:paddingTop="5dp"
+        android:paddingLeft="5dp"/>
 
 </RelativeLayout>
