@@ -21,7 +21,7 @@ import android.widget.ProgressBar;
 
 import java.util.Random;
 
-public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Callback, View.OnTouchListener{
+public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Callback, View.OnTouchListener {
 
     //variables declaration
     SurfaceHolder holder;
@@ -67,13 +67,15 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     public boolean mainThrusterOn;
     public boolean leftThrusterOn;
     public boolean rightThrusterOn;
+    private int mainThrusterPower = 5;
+    private int minorThrusterPower = 3;
 
     //variables that affect rocket movement
-    private final int GRAVITY = 5;
+    private final int GRAVITY = 2;
     private final int TERMINAL_VELOCITY = 200;
     //fuel variables
     public int fuel;
-    private ProgressBar fuelGuage;
+    private ProgressBar fuelGauge;
 
 
 
@@ -118,9 +120,10 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
             }
             canvas = holder.lockCanvas();
             synchronized (holder){
+                update();
                 doDraw(canvas);
             }
-
+            holder.unlockCanvasAndPost(canvas);
             try {
                 Thread.sleep(50);
             }
@@ -128,7 +131,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
                 e.printStackTrace();
             }
 
-            holder.unlockCanvasAndPost(canvas);
+
         }
     }
 
@@ -183,6 +186,8 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
 
         createMarsTerrain();
         createRocketShip();
+
+        fuel = 100;
     }
 
     private void createMarsTerrain() {
@@ -281,23 +286,65 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         else if (rocketX < 0) {
             rocketX = screenWidth;
         }
-        
+
+        int speedX = 0;
         int speedY = 0;
-        int positionY = (int) rocketY;
-        
-        speedY = speedY + GRAVITY;
+
+//        int positionY = (int) rocketY;
+        //vertical position
+        if (speedY >= 0) {
+            //rocket is falling
+            speedY += GRAVITY;
+        }
+        else {
+            //rocket is rising/going up
+            speedY = speedY + GRAVITY;
+        }
+
+
         if (speedY > TERMINAL_VELOCITY) {
             speedY = TERMINAL_VELOCITY;
         }
-        rocketY = positionY + speedY;
+        rocketY += speedY;
+
+        if (mainThrusterOn && fuel > 0) {
+            speedY -= mainThrusterPower;
+        }
+
+        //horizontal position
+        //gravity is not application here
+        if (speedX > 0) {
+            speedX = speedX - 1;
+        }
+        if (speedX < 0) {
+            speedX = speedX + 1;
+        }
+        else {
+            //if speedX = 0, no horizontal movement
+        }
+        rocketX +=speedX;
+
+        //draw rocket path
+        rocketPath.reset();
+        rocketPath.moveTo(rocketX + (rocket.getWidth()/2), rocketY);
+        rocketPath.lineTo(rocketX, rocketY + rocket.getHeight());
+        rocketPath.lineTo(rocketX + rocket.getWidth(), rocketY + rocket.getHeight());
+        rocketPath.close();
     }
+
+    //fuel gauge
+    public void setFuelGauge(ProgressBar progressBar) {
+        //use to update progress bar on game thread
+        fuelGauge = progressBar;
+    }
+
 
     //fuel level
     private void fuelLevel() {
-        if (mainThrusterOn || leftThrusterOn || rightThrusterOn) {
+        if (mainThrusterOn) {
             fuel -= -1;
         }
-        fuelGuage.setProgress(fuel);
+        fuelGauge.setProgress(fuel);
     }
 
     //collision detection
@@ -315,8 +362,8 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
 
     //methods that need updating
     private void update() {
-        rocketPosition();
         fuelLevel();
+        rocketPosition();
         collisionDetection();
     }
 
@@ -350,27 +397,31 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         gameThread = null;
     }
 
-
     @Override
-    public boolean onTouch(View view, MotionEvent event) {
+    public boolean onTouch(View v, MotionEvent event) {
+
         x = event.getX();
         y = event.getY();
 
-        switch (event.getAction()){
+        switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                break;
             case MotionEvent.ACTION_POINTER_DOWN:
                 testCircle.reset();
-                testCircle.addCircle(x, y, 25, Path.Direction.CW);
-                test.lineTo(x, y);
+                testCircle.addCircle(x, y, 20, Path.Direction.CW);
+                test.lineTo(x,y);
+                //Log.e("click",Float.toString(x)+","+Float.toString(y));
+                mainThrusterOn = true;
+                Log.e("main thruster","on");
                 break;
             case MotionEvent.ACTION_MOVE:
 
                 break;
             case MotionEvent.ACTION_UP:
-                break;
             case MotionEvent.ACTION_POINTER_UP:
-
+                mainThrusterOn = false;
+                Log.e("main thruster","stop");
+                break;
+            case MotionEvent.ACTION_CANCEL:
                 break;
         }
 

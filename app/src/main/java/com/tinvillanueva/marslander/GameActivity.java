@@ -10,15 +10,17 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 
 
-public class GameActivity extends Activity implements View.OnTouchListener {
+public class GameActivity extends Activity implements View.OnTouchListener{
 
     private GameView gameView;
     private ImageButton leftThruster;
     private ImageButton rightThruster;
     private ImageButton mainThruster;
     private ImageButton pause;
+    private ProgressBar fuelGauge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,47 +43,50 @@ public class GameActivity extends Activity implements View.OnTouchListener {
         pause = (ImageButton) findViewById(R.id.btnPause);
         pause.setOnTouchListener(this);
 
+        fuelGauge = (ProgressBar) findViewById(R.id.fuelGauge);
+        gameView.setFuelGauge(fuelGauge);
+
     }
 
 
     @Override
     public boolean onTouch(View view, MotionEvent event) {
-        int id = view.getId();
-
-        switch (event.getAction()){
-            case MotionEvent.ACTION_DOWN:
-                if (id == R.id.btnLeftThruster){
-                    gameView.leftThrusterOn = true;
-                }
-                if (id == R.id.btnRightThruster) {
-                    gameView.rightThrusterOn = true;
-                }
-                if (id == R.id.btnMainThruster) {
-                    gameView.mainThrusterOn = true;
-                }
-                break;
-            case MotionEvent.ACTION_POINTER_DOWN:
-
-                break;
-            case MotionEvent.ACTION_MOVE:
-
-                break;
-            case MotionEvent.ACTION_UP:
-                if (id == R.id.btnLeftThruster){
-                    gameView.leftThrusterOn = false;
-                }
-                if (id == R.id.btnRightThruster) {
-                    gameView.rightThrusterOn = false;
-                }
-                if (id == R.id.btnMainThruster) {
-                    gameView.mainThrusterOn = false;
-                }
-                break;
-            case MotionEvent.ACTION_POINTER_UP:
-
-                break;
-        }
-
+//        int id = view.getId();
+//
+//        switch (event.getAction()){
+//            case MotionEvent.ACTION_DOWN:
+//                if (id == R.id.btnLeftThruster){
+//                    gameView.leftThrusterOn = true;
+//                }
+//                if (id == R.id.btnRightThruster) {
+//                    gameView.rightThrusterOn = true;
+//                }
+//                if (id == R.id.btnMainThruster) {
+//                    gameView.mainThrusterOn = true;
+//                }
+//                break;
+//            case MotionEvent.ACTION_POINTER_DOWN:
+//
+//                break;
+//            case MotionEvent.ACTION_MOVE:
+//
+//                break;
+//            case MotionEvent.ACTION_UP:
+//                if (id == R.id.btnLeftThruster){
+//                    gameView.leftThrusterOn = false;
+//                }
+//                if (id == R.id.btnRightThruster) {
+//                    gameView.rightThrusterOn = false;
+//                }
+//                if (id == R.id.btnMainThruster) {
+//                    gameView.mainThrusterOn = false;
+//                }
+//                break;
+//            case MotionEvent.ACTION_POINTER_UP:
+//
+//                break;
+//        }
+//
         return false;
     }
 
