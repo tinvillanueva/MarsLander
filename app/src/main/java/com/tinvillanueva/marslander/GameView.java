@@ -12,12 +12,16 @@ import android.graphics.Region;
 import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import java.util.Random;
 
-public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Callback{
+public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Callback, View.OnTouchListener{
 
     //variables declaration
     SurfaceHolder holder;
@@ -49,6 +53,8 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     private int landingPadX;
     private int landingPadY;
 
+    private Path test, testCircle;
+
     //flying object variables
     private Bitmap rocket;
     private Bitmap mainFlame;
@@ -57,6 +63,18 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     private float rocketX;
     private float rocketY;
     private Path rocketPath;
+    private Region rocketRegion;
+    public boolean mainThrusterOn;
+    public boolean leftThrusterOn;
+    public boolean rightThrusterOn;
+
+    //variables that affect rocket movement
+    private final int GRAVITY = 5;
+    private final int TERMINAL_VELOCITY = 200;
+    //fuel variables
+    public int fuel;
+    private ProgressBar fuelGuage;
+
 
 
 
@@ -131,6 +149,18 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
 
         //rocket
         canvas.drawBitmap(rocket, rocketX, rocketY, null);
+        boolean paused = false;
+        if (fuel > 0) {
+            if (mainThrusterOn) {
+                canvas.drawBitmap(mainFlame, rocketX, rocketY, null);
+            }
+            if (leftThrusterOn) {
+                canvas.drawBitmap(leftFlame, rocketX, rocketY, null);
+            }
+            if (rightThrusterOn) {
+                canvas.drawBitmap(rightFlame, rocketX, rocketY, null);
+            }
+        }
     }
 
     //setup game
@@ -242,8 +272,53 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         rocketPath = new Path();
     }
 
+    //rocketPosition
+    private void rocketPosition() {
+        //check for boundaries
+        if (rocketX > screenWidth) {
+            rocketX = 0;
+        }
+        else if (rocketX < 0) {
+            rocketX = screenWidth;
+        }
+        
+        int speedY = 0;
+        int positionY = (int) rocketY;
+        
+        speedY = speedY + GRAVITY;
+        if (speedY > TERMINAL_VELOCITY) {
+            speedY = TERMINAL_VELOCITY;
+        }
+        rocketY = positionY + speedY;
+    }
 
+    //fuel level
+    private void fuelLevel() {
+        if (mainThrusterOn || leftThrusterOn || rightThrusterOn) {
+            fuel -= -1;
+        }
+        fuelGuage.setProgress(fuel);
+    }
 
+    //collision detection
+    private void collisionDetection() {
+        clip = new Region(0, 0, screenWidth, screenHeight);
+        Region region1 = new Region();
+        region1.setPath(testCircle, clip);
+        Region region2 = new Region();
+        region2.setPath(landingPadPath, clip);
+        if (!region1.quickReject(region2) && region1.op(region2, Region.Op.INTERSECT)){
+            Log.e("collision", "Landed");
+        }
+
+    }
+
+    //methods that need updating
+    private void update() {
+        rocketPosition();
+        fuelLevel();
+        collisionDetection();
+    }
 
     //start game thread
     public void startGame(){
@@ -276,4 +351,29 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     }
 
 
+    @Override
+    public boolean onTouch(View view, MotionEvent event) {
+        x = event.getX();
+        y = event.getY();
+
+        switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                break;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                testCircle.reset();
+                testCircle.addCircle(x, y, 25, Path.Direction.CW);
+                test.lineTo(x, y);
+                break;
+            case MotionEvent.ACTION_MOVE:
+
+                break;
+            case MotionEvent.ACTION_UP:
+                break;
+            case MotionEvent.ACTION_POINTER_UP:
+
+                break;
+        }
+
+        return true;
+    }
 }

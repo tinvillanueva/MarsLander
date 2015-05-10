@@ -43,10 +43,22 @@ public class GameActivity extends Activity implements View.OnTouchListener {
 
     }
 
+
     @Override
     public boolean onTouch(View view, MotionEvent event) {
+        int id = view.getId();
+
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
+                if (id == R.id.btnLeftThruster){
+                    gameView.leftThrusterOn = true;
+                }
+                if (id == R.id.btnRightThruster) {
+                    gameView.rightThrusterOn = true;
+                }
+                if (id == R.id.btnMainThruster) {
+                    gameView.mainThrusterOn = true;
+                }
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
 
@@ -55,6 +67,15 @@ public class GameActivity extends Activity implements View.OnTouchListener {
 
                 break;
             case MotionEvent.ACTION_UP:
+                if (id == R.id.btnLeftThruster){
+                    gameView.leftThrusterOn = false;
+                }
+                if (id == R.id.btnRightThruster) {
+                    gameView.rightThrusterOn = false;
+                }
+                if (id == R.id.btnMainThruster) {
+                    gameView.mainThrusterOn = false;
+                }
                 break;
             case MotionEvent.ACTION_POINTER_UP:
 
