@@ -21,7 +21,7 @@ import android.widget.ProgressBar;
 
 import java.util.Random;
 
-public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Callback, View.OnTouchListener {
+public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Callback {
 
     //variables declaration
     SurfaceHolder holder;
@@ -67,11 +67,11 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     public boolean mainThrusterOn;
     public boolean leftThrusterOn;
     public boolean rightThrusterOn;
-    private int mainThrusterPower = 5;
-    private int minorThrusterPower = 3;
+    private int mainThrusterPower = 2;
+    private int minorThrusterPower = 2;
 
     //variables that affect rocket movement
-    private final int GRAVITY = 2;
+    private final int GRAVITY = 1;
     private final int TERMINAL_VELOCITY = 200;
     //fuel variables
     public int fuel;
@@ -150,9 +150,9 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         paint.setStyle(Paint.Style.STROKE);
         canvas.drawPath( landingPadPath, paint);
 
-        //rocket
+        //rocket & thrusters
         canvas.drawBitmap(rocket, rocketX, rocketY, null);
-        boolean paused = false;
+
         if (fuel > 0) {
             if (mainThrusterOn) {
                 canvas.drawBitmap(mainFlame, rocketX, rocketY, null);
@@ -322,7 +322,16 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         else {
             //if speedX = 0, no horizontal movement
         }
-        rocketX +=speedX;
+        rocketX += speedX;
+
+        if (fuel > 0){
+            if (leftThrusterOn) {
+                speedX += minorThrusterPower;
+            }
+            if (rightThrusterOn) {
+                speedX -= minorThrusterPower;
+            }
+        }
 
         //draw rocket path
         rocketPath.reset();
@@ -347,24 +356,24 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         fuelGauge.setProgress(fuel);
     }
 
-    //collision detection
-    private void collisionDetection() {
-        clip = new Region(0, 0, screenWidth, screenHeight);
-        Region region1 = new Region();
-        region1.setPath(testCircle, clip);
-        Region region2 = new Region();
-        region2.setPath(landingPadPath, clip);
-        if (!region1.quickReject(region2) && region1.op(region2, Region.Op.INTERSECT)){
-            Log.e("collision", "Landed");
-        }
-
-    }
+//    //collision detection
+//    private void collisionDetection() {
+//        clip = new Region(0, 0, screenWidth, screenHeight);
+//        Region region1 = new Region();
+//        region1.setPath(testCircle, clip);
+//        Region region2 = new Region();
+//        region2.setPath(landingPadPath, clip);
+//        if (!region1.quickReject(region2) && region1.op(region2, Region.Op.INTERSECT)){
+//            Log.e("collision", "Landed");
+//        }
+//
+//    }
 
     //methods that need updating
     private void update() {
         fuelLevel();
         rocketPosition();
-        collisionDetection();
+//        collisionDetection();
     }
 
     //start game thread
@@ -395,36 +404,5 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
             }
         }
         gameThread = null;
-    }
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-
-        x = event.getX();
-        y = event.getY();
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-            case MotionEvent.ACTION_POINTER_DOWN:
-                testCircle.reset();
-                testCircle.addCircle(x, y, 20, Path.Direction.CW);
-                test.lineTo(x,y);
-                //Log.e("click",Float.toString(x)+","+Float.toString(y));
-                mainThrusterOn = true;
-                Log.e("main thruster","on");
-                break;
-            case MotionEvent.ACTION_MOVE:
-
-                break;
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_POINTER_UP:
-                mainThrusterOn = false;
-                Log.e("main thruster","stop");
-                break;
-            case MotionEvent.ACTION_CANCEL:
-                break;
-        }
-
-        return true;
     }
 }
