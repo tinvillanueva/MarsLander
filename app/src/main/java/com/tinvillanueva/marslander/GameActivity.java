@@ -84,16 +84,21 @@ public class GameActivity extends Activity implements View.OnTouchListener{
                 if (id == R.id.btnMainThruster) {
                     gameView.mainThrusterOn = false;
                 }
+                if (id == R.id.btnPause) {
+                    gameView.togglePause();
+                }
+                break;
+            case MotionEvent.ACTION_CANCEL:
                 break;
         }
 
-        return false;
+        return true;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        gameView.startGame();
+        gameView.startGameThread();
     }
 
     @Override
@@ -106,6 +111,6 @@ public class GameActivity extends Activity implements View.OnTouchListener{
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_menu, menu);
-        return true;
+        return false;
     }
 }
