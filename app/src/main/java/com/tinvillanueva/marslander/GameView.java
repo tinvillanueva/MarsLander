@@ -26,6 +26,8 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     //variables declaration
     SurfaceHolder holder;
     private Thread gameThread;
+    private boolean paused;
+    private boolean gameOver;
     private float x;
     private float y;
     private int screenWidth;
@@ -72,7 +74,9 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
 
     //variables that affect rocket movement
     private final int GRAVITY = 1;
-    private final int TERMINAL_VELOCITY = 200;
+    private final int TERMINAL_VELOCITY = 50;
+    private int speedX = 0;
+    private int speedY = 0;
     //fuel variables
     public int fuel;
     private ProgressBar fuelGauge;
@@ -183,11 +187,12 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         paint.setColor(Color.BLUE);
         paint.setStrokeWidth(5);
 
-
         createMarsTerrain();
         createRocketShip();
 
         fuel = 100;
+        paused = false;
+        gameOver = false;
     }
 
     private void createMarsTerrain() {
@@ -287,8 +292,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
             rocketX = screenWidth;
         }
 
-        int speedX = 0;
-        int speedY = 0;
+
 
 //        int positionY = (int) rocketY;
         //vertical position
@@ -350,14 +354,24 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
 
     //fuel level
     private void fuelLevel() {
-        if (mainThrusterOn) {
+        if (mainThrusterOn || leftThrusterOn || rightThrusterOn) {
             fuel -= -1;
         }
         fuelGauge.setProgress(fuel);
     }
 
-//    //collision detection
-//    private void collisionDetection() {
+    //collision detection
+    private void collisionDetection() {
+        rocketRegion = new Region();
+        rocketRegion.setPath(rocketPath, clip);
+        if (!rocketRegion.quickReject(landingPadRegion) && rocketRegion.op(landingPadRegion, Region.Op.INTERSECT)){
+            Log.e("collision", "Landed!");
+            //gameover = true
+        }
+        if (!rocketRegion.quickReject(landingPadRegion) && rocketRegion.op(landingPadRegion, Region.Op.INTERSECT)){
+            Log.e("collision", "Crashed!");
+            //gameover = false
+        }
 //        clip = new Region(0, 0, screenWidth, screenHeight);
 //        Region region1 = new Region();
 //        region1.setPath(testCircle, clip);
@@ -366,14 +380,15 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
 //        if (!region1.quickReject(region2) && region1.op(region2, Region.Op.INTERSECT)){
 //            Log.e("collision", "Landed");
 //        }
-//
-//    }
+
+
+    }
 
     //methods that need updating
     private void update() {
         fuelLevel();
         rocketPosition();
-//        collisionDetection();
+        collisionDetection();
     }
 
     //start game thread
