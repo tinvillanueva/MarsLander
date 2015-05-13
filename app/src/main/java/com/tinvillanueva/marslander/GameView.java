@@ -44,7 +44,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     private Region terrainRegion;
     private Bitmap terrainTexture;
     private BitmapShader terrainShader;
-//    private Random randomTerrain;
+    private Random randomTerrain;
 
     private Path landingPadPath;
     private Region landingPadRegion;
@@ -52,8 +52,6 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     private int landingPadWidth;
     private int landingPadX;
     private int landingPadY;
-
-    private Path test, testCircle;
 
     //flying object variables
     private Bitmap rocket;
@@ -71,7 +69,6 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     private int mainThrusterPower = 3;
     private int minorThrusterPower = 2;
 
-
     //variables that affect rocket movement
     private final int GRAVITY = 1;
     private final int TERMINAL_VELOCITY = 50;
@@ -81,12 +78,13 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     public int fuel;
     private ProgressBar fuelGauge;
     private boolean win;
-    private String result;
     private String score;
-    private Paint textResultPaint;
+    private Paint textPaint;
 
-
-
+    //background variables
+    private Paint backgroundPaint;
+    private Bitmap backgroundTexture;
+    private BitmapShader backgroundShader;
 
     //default constructor
     public GameView(Context context) {
@@ -128,7 +126,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
             }
             canvas = holder.lockCanvas();
             synchronized (holder) {
-                if (!paused && !gameDone) {
+                if (!gameDone) {
                     update();
                 }
                 doDraw(canvas);
@@ -144,7 +142,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         }
     }
 
-    //setup game
+    //game initialization
     private void setupGame(){
         holder = getHolder();
         holder.addCallback(this);
@@ -158,9 +156,15 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         clip = new Region(0, 0, screenWidth, screenHeight);
         explosion = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.explosion);
 
-        paint = new Paint();
-        paint.setColor(Color.BLUE);
-        paint.setStrokeWidth(5);
+        backgroundTexture = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.background);
+        backgroundShader = new BitmapShader(backgroundTexture, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+        backgroundPaint = new Paint();
+        backgroundPaint.setColor(0xFFFFFFFF);
+        backgroundPaint.setShader(backgroundShader);
+
+//        paint = new Paint();
+//        paint.setColor(Color.BLUE);
+//        paint.setStrokeWidth(5);
 
         createMarsTerrain();
         createRocketShip();
@@ -169,16 +173,18 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         paused = false;
         gameDone = false;
 
-        textResultPaint = new Paint();
-        textResultPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        textResultPaint.setColor(Color.WHITE);
-        textResultPaint.setTextSize((screenWidth > 900) ? 80 : 20);
+        textPaint = new Paint();
+        textPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        textPaint.setColor(Color.WHITE);
+        textPaint.setTextSize((screenWidth > 900) ? 80 : 20);
+
+        paint = new Paint();
+        paint.setColor(Color.RED);
     }
 
     private void doDraw(Canvas canvas) {
-        canvas.drawColor(Color.BLACK);  //background color
-        //terrain
-        canvas.drawRect(0, 0, screenWidth, screenHeight, paint);
+//        canvas.drawColor(Color.BLACK);  //background color
+        canvas.drawRect(0, 0, screenWidth, screenHeight, backgroundPaint);
 //        canvas.drawPath(terrainPath,terrainPaint);
 //        paint.setColor(Color.DKGRAY);
         canvas.drawPath(terrainPath, terrainPaint);
@@ -205,26 +211,21 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
             }
         }
         
-        //message output if rocket has been landed or crashed ou paused
-        if (paused) {
-            canvas.drawText("paused", (screenWidth/2) - 80, (screenHeight/3) - ((screenWidth > 700)?220:60), textResultPaint);
-        }
+        //message output if rocket has been landed or crashed
         if (gameDone) {
-            textResultPaint = new Paint();
             if (win) {
                 canvas.drawText("Congratulation! You are a good pilot", (screenWidth/2) - 80,
-                       screenHeight/3 - ((screenWidth>700)?220:60), textResultPaint);
+                       screenHeight/3 - ((screenWidth>700)?220:60), textPaint);
+
             }
             else {
                 canvas.drawBitmap(explosion, rocketX, rocketY, null);
-                canvas.drawText("GAME OVER", (screenWidth/2)-50, (screenHeight/3)-((screenWidth>700)?90:30), textResultPaint);
-                canvas.drawText("score: -1", (screenWidth/2)-95, (screenHeight/3), textResultPaint);
-                canvas.drawText(score, (screenWidth/2)-95, (screenHeight/3)+((screenWidth>700)?90:30), textResultPaint);
+                canvas.drawText("GAME OVER", (screenWidth/2)-50, (screenHeight/3)-((screenWidth>700)?90:30), textPaint);
+                canvas.drawText("score: -1", (screenWidth/2)-95, (screenHeight/3), textPaint);
+                canvas.drawText(score, (screenWidth/2)-95, (screenHeight/3)+((screenWidth>700)?90:30), textPaint);
             }
         }
     }
-
-
 
     private void createMarsTerrain() {
         //terrain texture
@@ -234,9 +235,8 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         terrainPaint.setColor(0xFFFFFFFF);
         terrainPaint.setStyle(Paint.Style.FILL);
         terrainPaint.setShader(terrainShader);
-
         //random terrain path
-        Random randomTerrain = new Random();
+        randomTerrain = new Random();
 
         terrainPath = new Path();
         terrainPath.setFillType(Path.FillType.WINDING);
@@ -247,8 +247,8 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
 
         terrainPath.lineTo(lastX, lastY);
 
-        int newX=lastX;
-        int	newY=lastY;
+        int newX = lastX;
+        int	newY = lastY;
 
         boolean landingPadExists = false;
 
@@ -258,15 +258,18 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
             newX += randomTerrain.nextInt(screenWidth/MIN_TERRAIN_POINTS);
             newY = screenHeight - randomTerrain.nextInt(screenHeight/2);
 
-            terrainPath.cubicTo(interpolateLinear(lastX, newX, 0.333f), lastY, interpolateLinear(lastX, newX, 0.666f), newY, newX, newY);
+            terrainPath.cubicTo(interpolateLinear(lastX, newX, 0.333f), lastY,
+                    interpolateLinear(lastX, newX, 0.666f), newY, newX, newY);
 
             //draw some flat land on second half of the screen but only draw it once. then create a separate path for landing pad at the cords
             if(newX > (screenWidth/2) && !landingPadExists) {
                 landingPadWidth = (screenWidth/5);
-                landingPadX = newX + randomTerrain.nextInt(screenWidth/MIN_TERRAIN_POINTS); //the landing pads x
-                landingPadY = screenHeight - randomTerrain.nextInt(screenWidth/MIN_TERRAIN_POINTS); //the landing pads y
+                landingPadX = newX + randomTerrain.nextInt(screenWidth/MIN_TERRAIN_POINTS);
+                landingPadY = screenHeight - randomTerrain.nextInt(screenWidth/MIN_TERRAIN_POINTS);
 
-                terrainPath.cubicTo(interpolateLinear(newX, landingPadX, 0.333f), newY, interpolateLinear(newX, landingPadX, 0.666f), landingPadY, landingPadX, landingPadY);
+                terrainPath.cubicTo(interpolateLinear(newX, landingPadX, 0.333f), newY,
+                        interpolateLinear(newX, landingPadX, 0.666f),
+                        landingPadY, landingPadX, landingPadY);
                 //terrainPath.lineTo(landingPadX,landingPadY);
                 terrainPath.lineTo(landingPadX + landingPadWidth, landingPadY);
 
@@ -282,7 +285,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
 
         terrainRegion = new Region();
         terrainRegion.setPath(terrainPath, clip);
-        }
+
     }
 
     //support method for mars terrain
@@ -316,7 +319,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
 
     //rocketPosition
     private void rocketPosition() {
-        //check for boundaries
+        //check for boundaries. if off side of the screen it will be repositioned
         if (rocketX > screenWidth) {
             rocketX = 0;
         }
@@ -436,20 +439,14 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         running = true;
     }
 
-    //pause game thread
-    public void pauseGame(){
-        running = false;
-        boolean retry = true;
-        while (retry){
-            try {
-                gameThread.join();  //finishes game thread and let it die a natural death
-                retry = false;
-            }
-            catch (InterruptedException e){
-                e.printStackTrace();
-            }
-        }
-        gameThread = null;
+    public void reset() {
+        win = false;
+        gameDone = false;
+        createRocketShip();
+        createMarsTerrain(); // to create a new random terrain
+        speedX = 0;
+        speedY = 0;
+        fuel = 100;
     }
 
     public void gameResult(boolean win) {
@@ -465,12 +462,5 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
 
     }
 
-    public void togglePause() {
-        if (paused) {
-            paused = false;
-        }
-        else {
-            paused = true;
-        }
-    }
+
 }

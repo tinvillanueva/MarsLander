@@ -13,33 +13,36 @@
 
 
     <ImageButton
+        android:id="@+id/btnLeftThruster"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/btnLeftThruster"
         android:src="@drawable/leftthruster"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true" />
+
     <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/btnRightThruster"
         android:src="@drawable/rightthruster"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignTop="@+id/btnLeftThruster"
         android:layout_toEndOf="@+id/btnLeftThruster" />
+
     <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/btnMainThruster"
-        android:src="@drawable/mainthruster"
-        android:layout_alignTop="@+id/btnPause"
-        android:layout_alignParentEnd="true" />
-    <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/btnPause"
-        android:src="@drawable/pause"
-        android:layout_alignTop="@+id/btnRightThruster"
-        android:layout_toStartOf="@+id/btnMainThruster" />
+        android:src="@drawable/mainthruster"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
+
+    <ImageButton
+        android:id="@+id/btnReset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/reset"
+        android:layout_alignTop="@+id/gameView"
+        android:layout_alignEnd="@+id/gameView" />
 
     <ProgressBar
         style="?android:attr/progressBarStyleHorizontal"
