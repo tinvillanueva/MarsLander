@@ -78,6 +78,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     public int fuel;
     private ProgressBar fuelGauge;
     private boolean win;
+    private String resultMessage;
     private String score;
     private Paint textPaint;
 
@@ -175,8 +176,11 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
 
         textPaint = new Paint();
         textPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        textPaint.setColor(Color.WHITE);
-        textPaint.setTextSize((screenWidth > 900) ? 80 : 20);
+        textPaint.setTextAlign(Paint.Align.CENTER);
+        textPaint.setTextSize(this.getResources().getDimensionPixelSize(R.dimen.text_size));
+
+//        textPaint.setColor(Color.WHITE);
+//        textPaint.setTextSize((screenWidth > 900) ? 80 : 20);
 
         paint = new Paint();
         paint.setColor(Color.RED);
@@ -213,16 +217,19 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         
         //message output if rocket has been landed or crashed
         if (gameDone) {
+            int messageLength = 0;
             if (win) {
-                canvas.drawText("Congratulation! You are a good pilot", (screenWidth/2) - 80,
-                       screenHeight/3 - ((screenWidth>700)?220:60), textPaint);
 
+                textPaint.setColor(Color.WHITE);
+                canvas.drawText(resultMessage, screenWidth/2, screenHeight/3, textPaint);
+                canvas.drawText(score, screenWidth/2, (screenHeight/3)+((screenWidth>700)?90:30), textPaint);
             }
             else {
+                textPaint.setColor(Color.RED);
+//                textPaint.setTextAlign(Paint.Align.CENTER);
                 canvas.drawBitmap(explosion, rocketX, rocketY, null);
-                canvas.drawText("GAME OVER", (screenWidth/2)-50, (screenHeight/3)-((screenWidth>700)?90:30), textPaint);
-                canvas.drawText("score: -1", (screenWidth/2)-95, (screenHeight/3), textPaint);
-                canvas.drawText(score, (screenWidth/2)-95, (screenHeight/3)+((screenWidth>700)?90:30), textPaint);
+                canvas.drawText("GAME OVER", screenWidth/2, (screenHeight/3)-((screenWidth>700)?90:30), textPaint);
+                canvas.drawText(resultMessage, screenWidth/2, screenHeight/3, textPaint);
             }
         }
     }
@@ -398,12 +405,10 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         rocketRegion.setPath(rocketPath, clip);
         if (!rocketRegion.quickReject(landingPadRegion) && rocketRegion.op(landingPadRegion, Region.Op.INTERSECT)){
             Log.e("collision", "Landed!");
-            //TODO if it landed, rocket should stop!
             gameResult(true);
         }
-        if (!rocketRegion.quickReject(landingPadRegion) && rocketRegion.op(terrainRegion, Region.Op.INTERSECT)){
+        if (!rocketRegion.quickReject(terrainRegion) && rocketRegion.op(terrainRegion, Region.Op.INTERSECT)){
             Log.e("collision", "Crashed!");
-            //TODO if it crash, rocket should stop too!
             gameResult(false);
         }
 //        clip = new Region(0, 0, screenWidth, screenHeight);
@@ -449,15 +454,31 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         fuel = 100;
     }
 
+    //adding game score
     public void gameResult(boolean win) {
         gameDone = true;
-
         if (win) {
             this.win = true;
-            score = "Good Job! You are a certified pilot!";
+            if (fuel > 120) {
+                score = "Your score: 5";
+            }
+            else if (fuel <= 120 && fuel > 90) {
+                score = "Your score: 4";
+            }
+            else if (fuel <=90 && fuel >50) {
+                score = "Your score: 3";
+            }
+            else if (fuel <= 50 && fuel > 30){
+                score = "Your score: 2";
+            }
+            else {
+                score = "Your score: 1";
+            }
+
+            resultMessage = "Good Job! You are a certified pilot!";
         }
         else {
-            score = "You need more practice flying a rocket! Try again";
+            resultMessage = "You need more practice flying a rocket! Try again";
         }
 
     }
