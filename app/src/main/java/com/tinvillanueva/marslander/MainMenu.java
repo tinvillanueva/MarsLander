@@ -42,10 +42,6 @@ public class MainMenu extends Activity implements OnClickListener {
                 startActivity(new Intent(this, GameActivity.class));
                 break;
 
-            //            case R.id.btnGameHelp:
-//                startActivity(new Intent(this, GameHelp.class));
-//                break;
-
             case R.id.btnExit:
                 AlertDialog.Builder exitDialog = new AlertDialog.Builder(context);
                 exitDialog.setTitle("Exit App");
