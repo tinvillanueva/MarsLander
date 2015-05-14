@@ -157,7 +157,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         clip = new Region(0, 0, screenWidth, screenHeight);
         explosion = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.explosion);
 
-        backgroundTexture = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.background);
+        backgroundTexture = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.space);
         backgroundShader = new BitmapShader(backgroundTexture, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
         backgroundPaint = new Paint();
         backgroundPaint.setColor(0xFFFFFFFF);
@@ -177,10 +177,8 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         textPaint = new Paint();
         textPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         textPaint.setTextAlign(Paint.Align.CENTER);
-        textPaint.setTextSize(this.getResources().getDimensionPixelSize(R.dimen.text_size));
-
+        textPaint.setTextSize(getResources().getDimensionPixelSize(R.dimen.text_size));
 //        textPaint.setColor(Color.WHITE);
-//        textPaint.setTextSize((screenWidth > 900) ? 80 : 20);
 
         paint = new Paint();
         paint.setColor(Color.RED);
@@ -196,7 +194,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
 //        paint.setColor(Color.GREEN);
 //        canvas.drawPath(terrainPath, paint);
         //landing pad
-        paint.setColor(Color.BLUE);
+        paint.setColor(Color.GREEN);
         paint.setStyle(Paint.Style.STROKE);
         canvas.drawPath( landingPadPath, paint);
 
@@ -222,13 +220,13 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
 
                 textPaint.setColor(Color.WHITE);
                 canvas.drawText(resultMessage, screenWidth/2, screenHeight/3, textPaint);
-                canvas.drawText(score, screenWidth/2, (screenHeight/3)+((screenWidth>700)?90:30), textPaint);
+                canvas.drawText(score, screenWidth/2, (screenHeight/3)+textPaint.descent()*5f, textPaint);
             }
             else {
                 textPaint.setColor(Color.RED);
 //                textPaint.setTextAlign(Paint.Align.CENTER);
                 canvas.drawBitmap(explosion, rocketX, rocketY, null);
-                canvas.drawText("GAME OVER", screenWidth/2, (screenHeight/3)-((screenWidth>700)?90:30), textPaint);
+                canvas.drawText("GAME OVER", screenWidth/2, (screenHeight/3)-textPaint.descent()*5f, textPaint);
                 canvas.drawText(resultMessage, screenWidth/2, screenHeight/3, textPaint);
             }
         }
@@ -480,8 +478,5 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         else {
             resultMessage = "You need more practice flying a rocket! Try again";
         }
-
     }
-
-
 }
