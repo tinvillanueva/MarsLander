@@ -13,7 +13,6 @@ import android.widget.Button;
 public class MainMenu extends Activity implements OnClickListener {
 
     private Button btnNewGame;
-    private Button btnGameHelp;
     private Button btnExit;
     private Context context = this;
 
@@ -25,9 +24,6 @@ public class MainMenu extends Activity implements OnClickListener {
 
         btnNewGame = (Button) findViewById(R.id.btnNewGame);
         btnNewGame.setOnClickListener(this);
-
-//        btnGameHelp = (Button) findViewById(R.id.btnHelp);
-//        btnGameHelp.setOnClickListener(this);
 
         btnExit = (Button) findViewById(R.id.btnExit);
         btnExit.setOnClickListener(this);
@@ -43,9 +39,9 @@ public class MainMenu extends Activity implements OnClickListener {
                 break;
 
             case R.id.btnExit:
-                AlertDialog.Builder exitDialog = new AlertDialog.Builder(context);
-                exitDialog.setTitle("Exit App");
-                exitDialog.setMessage("Do you want to exit 'Mars Lander?' ");
+                AlertDialog.Builder exitDialog = new AlertDialog.Builder(this);
+                exitDialog.setTitle(getString(R.string.exit_title));
+                exitDialog.setMessage(getString(R.string.exit_message));
                 exitDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int which){
                         finish();

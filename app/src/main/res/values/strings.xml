@@ -3,4 +3,6 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="exit_title">Exit App</string>
+    <string name="exit_message">"Do you want to exit 'Mars Lander?' "</string>
 </resources>

@@ -300,10 +300,11 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
 
     //landing pad where the rocket lands safely
     private void createLandingPad() {
+        int landingPadHalfWidth = 5;
         landingPadPath = new Path();
         landingPadPath.moveTo(landingPadX, landingPadY);
-        landingPadPath.lineTo(landingPadX + 5, landingPadY - 5);
-        landingPadPath.lineTo(landingPadX + landingPadWidth - 5, landingPadY - 5);
+        landingPadPath.lineTo(landingPadX + landingPadHalfWidth, landingPadY - landingPadHalfWidth);
+        landingPadPath.lineTo(landingPadX + landingPadWidth - landingPadHalfWidth, landingPadY - landingPadHalfWidth);
         landingPadPath.lineTo(landingPadX + landingPadWidth, landingPadY);
         landingPadPath.close();
         
